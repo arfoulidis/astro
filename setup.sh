@@ -5,7 +5,7 @@ echo "Starting Astro Minimal + Tailwind + DaisyUI setup..."
 npm create astro@latest . -- --template minimal --yes < /dev/null
 
 # 2. Install dependencies
-npm install tailwindcss@latest @tailwindcss/vite@latest daisyui@latest
+npm install tailwindcss@latest @tailwindcss/vite@latest daisyui@latest @astrojs/sitemap@latest
 
 # Ensure directories exist
 mkdir -p src/assets src/layouts src/pages
@@ -60,7 +60,7 @@ const { title = "My Site" } = Astro.props;
 EOF
 
 # 6. Add sitemap integration — also redirect stdin
-npx astro add sitemap --yes < /dev/null
+# npx astro add sitemap --yes < /dev/null
 
 # 7. Create robots.txt route
 cat > src/pages/robots.txt.ts << 'EOF'
