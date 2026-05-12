@@ -1,16 +1,18 @@
 #!/bin/bash
 echo "Starting Astro Minimal + Tailwind + DaisyUI setup..."
 
-# 1. Create Astro project — redirect stdin so it can't consume the pipe
+# Remove stale config so Astro doesn't try to load it during project creation
+rm -f astro.config.mjs
+
+# 1. Create Astro project
 npm create astro@latest . -- --template minimal --yes < /dev/null
 
-# 2. Install dependencies
+# 2. Install all dependencies up front, including sitemap
 npm install tailwindcss@latest @tailwindcss/vite@latest daisyui@latest @astrojs/sitemap@latest
 
-# Ensure directories exist
 mkdir -p src/assets src/layouts src/pages
 
-# 3. Write astro.config.mjs
+# 3. Write config AFTER all packages are installed
 cat > astro.config.mjs << 'EOF'
 // @ts-check
 import { defineConfig } from "astro/config";
@@ -35,13 +37,11 @@ export default defineConfig({
 });
 EOF
 
-# 4. Create CSS file
 cat > src/assets/app.css << 'EOF'
 @import "tailwindcss";
 @plugin "daisyui";
 EOF
 
-# 5. Create Layout.astro
 cat > src/layouts/Layout.astro << 'EOF'
 ---
 import "../assets/app.css";
@@ -59,10 +59,6 @@ const { title = "My Site" } = Astro.props;
 </html>
 EOF
 
-# 6. Add sitemap integration — also redirect stdin
-# npx astro add sitemap --yes < /dev/null
-
-# 7. Create robots.txt route
 cat > src/pages/robots.txt.ts << 'EOF'
 import type { APIRoute } from 'astro';
 const getRobotsTxt = (sitemapURL: URL) => `
@@ -76,7 +72,6 @@ export const GET: APIRoute = ({ site }) => {
 };
 EOF
 
-# 8. Create accessibility rules
 cat > rules.md << 'EOF'
 # Accessibility Rules for AI‑Generated Websites
 ## Semantic HTML
