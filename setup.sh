@@ -1,12 +1,19 @@
 #!/bin/bash
 
-# 1. Create Astro project
+echo "Starting Astro Minimal + Tailwind + DaisyUI setup..."
+
+# 1. Create Astro project (minimal template)
 npm create astro@latest . -- --template minimal --yes
 
 # 2. Install Tailwind, Tailwind Vite plugin, DaisyUI
 npm install tailwindcss@latest @tailwindcss/vite@latest daisyui@latest
 
-# 3. Update astro.config.mjs
+# Ensure directories exist
+mkdir -p src/assets
+mkdir -p src/layouts
+mkdir -p src/pages
+
+# 3. Write final astro.config.mjs (overwrite silently)
 cat > astro.config.mjs << 'EOF'
 // @ts-check
 import { defineConfig } from "astro/config";
@@ -14,23 +21,31 @@ import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
-  site: "https://example.com",
+  site: "https://gaglos.gr",
   vite: {
     plugins: [tailwindcss()],
   },
-  integrations: [sitemap()],
+  build: {
+    inlineStylesheets: "always",
+  },
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/admin') && !page.includes('/private'),
+      changefreq: 'weekly',
+      priority: 0.7,
+      lastmod: new Date(),
+    }),
+  ],
 });
 EOF
 
 # 4. Create CSS file with Tailwind + DaisyUI
-mkdir -p src/assets
 cat > src/assets/app.css << 'EOF'
 @import "tailwindcss";
 @plugin "daisyui";
 EOF
 
-# 5. Update Layout.astro
-mkdir -p src/layouts
+# 5. Create Layout.astro
 cat > src/layouts/Layout.astro << 'EOF'
 ---
 import "../assets/app.css";
@@ -49,11 +64,10 @@ const { title = "My Site" } = Astro.props;
 </html>
 EOF
 
-# 6. Add sitemap integration (already in config)
+# 6. Add sitemap integration (already in config but ensures deps)
 npx astro add sitemap --yes
 
 # 7. Create robots.txt route
-mkdir -p src/pages
 cat > src/pages/robots.txt.ts << 'EOF'
 import type { APIRoute } from 'astro';
 
@@ -69,17 +83,18 @@ export const GET: APIRoute = ({ site }) => {
 };
 EOF
 
-# 10. Create rules.md (accessibility-focused)
+# 8. Create accessibility rules
 cat > rules.md << 'EOF'
 # Accessibility Rules for AI‑Generated Websites
 
-## 1. Semantic HTML
-- Always use proper semantic tags: <header>, <main>, <nav>, <footer>, <section>, <article>.
-- Avoid <div> soup.
+## Semantic HTML
+Use proper semantic tags: header, main, nav, footer, section, article.
 
-## 2. Responsiveness
-- Layouts must work on mobile, tablet, and desktop.
-- Avoid horizontal scrolling.
+## Forms
+Every input must have a label. Provide clear error and success messages.
 
+## Responsiveness
+Layouts must work on all screen sizes. Avoid horizontal scrolling.
+EOF
 
 echo "Setup complete!"
