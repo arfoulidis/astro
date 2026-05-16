@@ -50,10 +50,15 @@ EOF
 cat > src/assets/app.css << 'EOF'
 @import "tailwindcss";
 @plugin "daisyui";
+
+@theme inline {
+  --font-sans: var(--font-geologica);
+}
 EOF
 
 cat > src/layouts/Layout.astro << 'EOF'
 ---
+import { Font } from "astro";
 import "../assets/app.css";
 const { title = "My Site" } = Astro.props;
 ---
@@ -62,6 +67,7 @@ const { title = "My Site" } = Astro.props;
     <meta charset="utf-8" />
     <title>{title}</title>
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <Font cssVariable="--font-geologica" preload />
   </head>
   <body class="min-h-screen bg-base-200 text-base-content">
     <slot />
