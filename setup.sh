@@ -18,6 +18,7 @@ cat > astro.config.mjs << 'EOF'
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
+import { fontProviders } from "@fontsource/core";
 export default defineConfig({
   site: "https://example.gr",
   vite: {
@@ -34,6 +35,15 @@ export default defineConfig({
       lastmod: new Date(),
     }),
   ],
+  fonts: [{
+    provider: fontProviders.fontsource(),
+    name: "Geologica",
+    cssVariable: "--font-geologica",
+    fallbacks: [
+      "Arial",
+      "sans-serif"
+    ]
+  }],
 });
 EOF
 
