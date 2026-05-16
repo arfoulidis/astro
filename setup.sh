@@ -1,8 +1,16 @@
 #!/bin/bash
 echo "Starting Astro Minimal + Tailwind + DaisyUI setup..."
 
-# Remove stale config so Astro doesn't try to load it during project creation
-rm -f astro.config.mjs
+# Back up existing config if it exists
+if [[ -f astro.config.mjs ]]; then
+  BACKUP_FILE="astro.config.mjs.backup.$(date +%s)"
+  mv astro.config.mjs "$BACKUP_FILE"
+  echo "📦 Backed up existing astro.config.mjs to $BACKUP_FILE"
+fi
+
+# Get current folder name for site URL
+FOLDER_NAME=$(basename "$(pwd)")
+SITE_URL="https://${FOLDER_NAME}.local"
 
 # 1. Create Astro project
 npm create astro@latest . -- --template minimal --yes < /dev/null
@@ -13,14 +21,14 @@ npm install tailwindcss@latest @tailwindcss/vite@latest daisyui@latest @astrojs/
 mkdir -p src/assets src/layouts src/pages
 
 # 3. Write config AFTER all packages are installed
-cat > astro.config.mjs << 'EOF'
+cat > astro.config.mjs << EOF
 // @ts-check
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import { fontProviders } from "@fontsource/core";
 export default defineConfig({
-  site: "https://example.gr",
+  site: "$SITE_URL",
   vite: {
     plugins: [tailwindcss()],
   },
@@ -99,3 +107,4 @@ Layouts must work on all screen sizes. Avoid horizontal scrolling.
 EOF
 
 echo "Setup complete!"
+echo "Site URL configured as: $SITE_URL"
