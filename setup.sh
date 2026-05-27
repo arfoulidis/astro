@@ -26,7 +26,7 @@ cat > astro.config.mjs << EOF
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
-import { fontProviders } from "@fontsource/core";
+import { fontProviders } from "astro/config";
 export default defineConfig({
   site: "$SITE_URL",
   vite: {
