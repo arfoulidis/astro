@@ -1,6 +1,13 @@
 #!/bin/bash
 echo "Starting Astro Minimal + Tailwind + DaisyUI setup..."
 
+# Ask for font, default to Geologica
+read -p "Enter font name (default: Geologica): " FONT_NAME
+FONT_NAME=${FONT_NAME:-Geologica}
+FONT_VAR=$(echo "$FONT_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+
+echo "Using font: $FONT_NAME"
+
 # Back up existing config if it exists
 if [[ -f astro.config.mjs ]]; then
   BACKUP_FILE="astro.config.mjs.backup.$(date +%s)"
@@ -45,8 +52,8 @@ export default defineConfig({
   ],
   fonts: [{
     provider: fontProviders.fontsource(),
-    name: "Geologica",
-    cssVariable: "--font-geologica",
+    name: "$FONT_NAME",
+    cssVariable: "--font-$FONT_VAR",
     fallbacks: [
       "Arial",
       "sans-serif"
@@ -60,7 +67,7 @@ cat > src/assets/app.css << 'EOF'
 @plugin "daisyui";
 
 @theme inline {
-  --font-sans: var(--font-geologica);
+  --font-sans: var(--font-$FONT_VAR);
 }
 EOF
 
@@ -75,7 +82,7 @@ const { title = "My Site" } = Astro.props;
     <meta charset="utf-8" />
     <title>{title}</title>
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <Font cssVariable="--font-geologica" preload />
+    <Font cssVariable="--font-$FONT_VAR" preload />
   </head>
   <body class="min-h-screen bg-base-200 text-base-content">
     <slot />
@@ -108,3 +115,4 @@ EOF
 
 echo "Setup complete!"
 echo "Site URL configured as: $SITE_URL"
+echo "Font configured as: $FONT_NAME"
