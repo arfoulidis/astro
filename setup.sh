@@ -73,7 +73,7 @@ EOF
 
 cat > src/layouts/Layout.astro << 'EOF'
 ---
-import { Font } from "astro";
+import { Font } from "astro:assets";
 import "../assets/app.css";
 const { title = "My Site" } = Astro.props;
 ---
