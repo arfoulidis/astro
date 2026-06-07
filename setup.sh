@@ -1,23 +1,12 @@
 #!/bin/bash
 echo "Starting Astro Minimal + Tailwind + DaisyUI setup..."
 
-# Ask for font, default to Geologica
-read -p "Enter font name (default: Geologica): " FONT_NAME
-FONT_NAME=${FONT_NAME:-Geologica}
-FONT_VAR=$(echo "$FONT_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-
-echo "Using font: $FONT_NAME"
-
 # Back up existing config if it exists
 if [[ -f astro.config.mjs ]]; then
   BACKUP_FILE="astro.config.mjs.backup.$(date +%s)"
   mv astro.config.mjs "$BACKUP_FILE"
   echo "📦 Backed up existing astro.config.mjs to $BACKUP_FILE"
 fi
-
-# Get current folder name for site URL
-FOLDER_NAME=$(basename "$(pwd)")
-SITE_URL="https://${FOLDER_NAME}.local"
 
 # 1. Create Astro project
 npm create astro@latest . -- --template minimal --yes < /dev/null
@@ -35,7 +24,6 @@ import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import { fontProviders } from "astro/config";
 export default defineConfig({
-  site: "$SITE_URL",
   vite: {
     plugins: [tailwindcss()],
   },
@@ -52,8 +40,9 @@ export default defineConfig({
   ],
   fonts: [{
     provider: fontProviders.fontsource(),
-    name: "$FONT_NAME",
-    cssVariable: "--font-$FONT_VAR",
+    name: "Geologica",
+    cssVariable: "--font-geologica",
+    subsets: ["latin", "greek"],
     fallbacks: [
       "Arial",
       "sans-serif"
@@ -67,7 +56,7 @@ cat > src/assets/app.css << 'EOF'
 @plugin "daisyui";
 
 @theme inline {
-  --font-sans: var(--font-$FONT_VAR);
+  --font-sans: var(--font-geologica);
 }
 EOF
 
@@ -77,12 +66,12 @@ import { Font } from "astro:assets";
 import "../assets/app.css";
 const { title = "My Site" } = Astro.props;
 ---
-<html lang="en">
+<html lang="el-gr" data-theme="bumblebee">
   <head>
     <meta charset="utf-8" />
     <title>{title}</title>
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <Font cssVariable="--font-$FONT_VAR" preload />
+    <Font cssVariable="--font-geologica" preload />
   </head>
   <body class="min-h-screen bg-base-200 text-base-content">
     <slot />
@@ -114,5 +103,6 @@ Layouts must work on all screen sizes. Avoid horizontal scrolling.
 EOF
 
 echo "Setup complete!"
-echo "Site URL configured as: $SITE_URL"
-echo "Font configured as: $FONT_NAME"
+echo "Font configured as: Geologica"
+echo "Language configured as: el-gr (Greek)"
+echo "Theme configured as: bumblebee"
