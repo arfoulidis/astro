@@ -9,10 +9,10 @@ if [[ -f astro.config.mjs ]]; then
 fi
 
 # 1. Create Astro project
-npm create astro@latest . -- --template minimal --yes < /dev/null
+bun create astro@latest . -- --template minimal --yes < /dev/null
 
 # 2. Install all dependencies up front, including sitemap
-npm install tailwindcss@latest @tailwindcss/vite@latest daisyui@latest @astrojs/sitemap@latest
+bun add tailwindcss@latest @tailwindcss/vite@latest daisyui@latest @astrojs/sitemap@latest
 
 mkdir -p src/assets src/layouts src/pages
 
