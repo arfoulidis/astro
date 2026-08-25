@@ -1,32 +1,3 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-# ---------------------------------------------------------------------------
-# 0. Requirements
-# ---------------------------------------------------------------------------
-
-if (( BASH_VERSINFO[0] < 4 )); then
-  echo "❌ Bash 4.0+ is required."
-  echo "   Current Bash: $BASH_VERSION"
-  echo ""
-  echo "   On macOS, install modern Bash with:"
-  echo "   brew install bash"
-  exit 1
-fi
-
-if ! command -v bun >/dev/null 2>&1; then
-  echo "❌ Bun is not installed or is not in PATH."
-  exit 1
-fi
-
-BUN_VERSION="$(bun --version)"
-
-echo "Astro Minimal + Tailwind + DaisyUI setup"
-echo "-----------------------------------------"
-echo "Bash : $BASH_VERSION"
-echo "Bun  : $BUN_VERSION"
-echo ""
-
 # ---------------------------------------------------------------------------
 # 1. Project / domain
 # ---------------------------------------------------------------------------
@@ -34,33 +5,37 @@ echo ""
 echo "Project setup"
 echo "-------------"
 echo ""
-echo "The project/domain name will be used as:"
-echo "  • the project directory"
-echo "  • the domain in astro.config.mjs"
+echo "Enter the domain name for the new Astro project."
+echo "This will also be used as the project folder."
 echo ""
-
-DEFAULT_PROJECT="$(basename "$PWD")"
+echo "Example:"
+echo "  georgadas.com"
+echo "  → ./georgadas.com/"
+echo "  → https://georgadas.com"
+echo ""
 
 PROJECT_NAME=""
 
 while [[ -z "$PROJECT_NAME" ]]; do
-  read -r -p "Project/domain name (default ${DEFAULT_PROJECT}): " PROJECT_INPUT || true
+  read -r -p "Domain / folder name: " PROJECT_INPUT
 
-  PROJECT_INPUT="${PROJECT_INPUT:-$DEFAULT_PROJECT}"
-
-  # Remove protocol and trailing slash.
+  # Remove accidental protocol and trailing slash.
   PROJECT_INPUT="${PROJECT_INPUT#https://}"
   PROJECT_INPUT="${PROJECT_INPUT#http://}"
   PROJECT_INPUT="${PROJECT_INPUT%/}"
 
   if [[ -z "$PROJECT_INPUT" ]]; then
-    echo "❌ Project name cannot be empty."
+    echo ""
+    echo "❌ Please enter a domain/folder name."
+    echo ""
     continue
   fi
 
   if [[ ! "$PROJECT_INPUT" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*[A-Za-z0-9]$ ]]; then
-    echo "❌ Invalid project/domain name: $PROJECT_INPUT"
+    echo ""
+    echo "❌ Invalid name: $PROJECT_INPUT"
     echo "   Use letters, numbers, dots and hyphens only."
+    echo ""
     continue
   fi
 
@@ -85,11 +60,11 @@ if [[ -e "$PROJECT_DIR" ]]; then
   echo "❌ The project directory already exists:"
   echo "   ./$PROJECT_DIR"
   echo ""
-  echo "For safety, this script will not overwrite an existing directory."
+  echo "Choose another domain/folder name or remove the existing directory."
   exit 1
 fi
 
-read -r -p "Create Astro project in ./$PROJECT_DIR? [Y/n] " CONFIRM
+read -r -p "Create this project? [Y/n] " CONFIRM
 CONFIRM="${CONFIRM:-Y}"
 
 if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
@@ -101,7 +76,8 @@ mkdir -p "$PROJECT_DIR"
 cd "$PROJECT_DIR"
 
 echo ""
-echo "📁 Created project directory: $PWD"
+echo "📁 Created project directory:"
+echo "   $PWD"
 echo ""
 
 # ---------------------------------------------------------------------------
