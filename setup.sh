@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# =============================================================================
-# Astro Minimal + Tailwind + DaisyUI setup
-# =============================================================================
-
 # ---------------------------------------------------------------------------
 # 0. Requirements
 # ---------------------------------------------------------------------------
@@ -20,28 +16,10 @@ fi
 
 if ! command -v bun >/dev/null 2>&1; then
   echo "❌ Bun is not installed or is not in PATH."
-  echo ""
-  echo "   Install Bun from https://bun.sh/"
   exit 1
 fi
 
 BUN_VERSION="$(bun --version)"
-
-# Require Bun 1.4+
-BUN_MAJOR="${BUN_VERSION%%.*}"
-BUN_REST="${BUN_VERSION#*.}"
-BUN_MINOR="${BUN_REST%%.*}"
-
-if ! [[ "$BUN_MAJOR" =~ ^[0-9]+$ ]] || ! [[ "$BUN_MINOR" =~ ^[0-9]+$ ]]; then
-  echo "❌ Could not determine Bun version: $BUN_VERSION"
-  exit 1
-fi
-
-if (( BUN_MAJOR < 1 || (BUN_MAJOR == 1 && BUN_MINOR < 4) )); then
-  echo "❌ Bun 1.4+ is required."
-  echo "   Current Bun: $BUN_VERSION"
-  exit 1
-fi
 
 echo "Astro Minimal + Tailwind + DaisyUI setup"
 echo "-----------------------------------------"
@@ -56,33 +34,38 @@ echo ""
 echo "Project setup"
 echo "-------------"
 echo ""
-echo "The project name will be used as both:"
-echo "  • the directory name"
-echo "  • the domain name"
-echo ""
-echo "Example:"
-echo "  georgadas.com"
-echo "  → ./georgadas.com/"
-echo "  → https://georgadas.com"
+echo "The project/domain name will be used as:"
+echo "  • the project directory"
+echo "  • the domain in astro.config.mjs"
 echo ""
 
 DEFAULT_PROJECT="$(basename "$PWD")"
 
-read -rp "Project/domain name (default ${DEFAULT_PROJECT}): " PROJECT_INPUT
-PROJECT_NAME="${PROJECT_INPUT:-$DEFAULT_PROJECT}"
+PROJECT_NAME=""
 
-# Remove accidental protocol / trailing slash.
-PROJECT_NAME="${PROJECT_NAME#https://}"
-PROJECT_NAME="${PROJECT_NAME#http://}"
-PROJECT_NAME="${PROJECT_NAME%/}"
+while [[ -z "$PROJECT_NAME" ]]; do
+  read -r -p "Project/domain name (default ${DEFAULT_PROJECT}): " PROJECT_INPUT || true
 
-# Basic domain/project-name validation.
-if [[ ! "$PROJECT_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*[A-Za-z0-9]$ ]]; then
-  echo ""
-  echo "❌ Invalid project/domain name: $PROJECT_NAME"
-  echo "   Use letters, numbers, dots and hyphens only."
-  exit 1
-fi
+  PROJECT_INPUT="${PROJECT_INPUT:-$DEFAULT_PROJECT}"
+
+  # Remove protocol and trailing slash.
+  PROJECT_INPUT="${PROJECT_INPUT#https://}"
+  PROJECT_INPUT="${PROJECT_INPUT#http://}"
+  PROJECT_INPUT="${PROJECT_INPUT%/}"
+
+  if [[ -z "$PROJECT_INPUT" ]]; then
+    echo "❌ Project name cannot be empty."
+    continue
+  fi
+
+  if [[ ! "$PROJECT_INPUT" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*[A-Za-z0-9]$ ]]; then
+    echo "❌ Invalid project/domain name: $PROJECT_INPUT"
+    echo "   Use letters, numbers, dots and hyphens only."
+    continue
+  fi
+
+  PROJECT_NAME="$PROJECT_INPUT"
+done
 
 SITE_DOMAIN="$PROJECT_NAME"
 PROJECT_DIR="$PROJECT_NAME"
@@ -95,7 +78,7 @@ echo "  Domain : https://$SITE_DOMAIN"
 echo ""
 
 # ---------------------------------------------------------------------------
-# 2. Confirm project creation
+# 2. Refuse to overwrite existing directory
 # ---------------------------------------------------------------------------
 
 if [[ -e "$PROJECT_DIR" ]]; then
@@ -103,13 +86,10 @@ if [[ -e "$PROJECT_DIR" ]]; then
   echo "   ./$PROJECT_DIR"
   echo ""
   echo "For safety, this script will not overwrite an existing directory."
-  echo ""
-  echo "If this is an incomplete project from a previous run, remove it first:"
-  echo "  rm -rf \"$PROJECT_DIR\""
   exit 1
 fi
 
-read -rp "Create Astro project in ./$PROJECT_DIR? [Y/n] " CONFIRM
+read -r -p "Create Astro project in ./$PROJECT_DIR? [Y/n] " CONFIRM
 CONFIRM="${CONFIRM:-Y}"
 
 if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
@@ -121,7 +101,7 @@ mkdir -p "$PROJECT_DIR"
 cd "$PROJECT_DIR"
 
 echo ""
-echo "📁 Created project directory: $PROJECT_DIR"
+echo "📁 Created project directory: $PWD"
 echo ""
 
 # ---------------------------------------------------------------------------
