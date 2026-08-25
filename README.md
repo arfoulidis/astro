@@ -8,8 +8,7 @@ When running the setup script, you'll be prompted to enter a font name. The scri
 
 **Example:**
 ```bash
-curl -s https://raw.githubusercontent.com/arfoulidis/astro/main/setup.sh | bash
-# When prompted: Enter font name (default: Geologica): Open Sans
+curl -fsSL https://raw.githubusercontent.com/arfoulidis/astro/main/setup.sh | bash
 ```
 
 The font will then be available as `var(--font-open-sans)` throughout your project.
